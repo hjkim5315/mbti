@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MBTI 학습 유형 진단 | 대학생 공부법 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(160deg, #EDF6F4 0%, #F7FAF9 60%, #EDF2F6 100%);
+    min-height: 100vh;
+  }
+
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px 36px;
+    max-width: 540px;
+    width: 100%;
+    box-shadow: 0 4px 32px rgba(60,120,100,0.09);
+  }
+
+  /* ── SCREEN TOGGLE ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── INTRO ── */
+  .intro-badge {
+    display: inline-block;
+    background: #E8F6F2;
+    color: #2D9E7E;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .intro-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1A2E28;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .intro-title span { color: #2D9E7E; }
+  .intro-desc {
+    font-size: 14.5px;
+    color: #5A7068;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+  .intro-meta {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    background: #F2F8F6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: #3A6B5E;
+    font-weight: 500;
+    flex: 1;
+    min-width: 90px;
+  }
+  .meta-chip strong { display: block; font-size: 15px; color: #1A2E28; margin-bottom: 2px; }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #8FA89F;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .progress-bar {
+    height: 6px;
+    background: #E8F0EE;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2D9E7E, #38C9A0);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ── QUESTION ── */
+  .q-axis {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #2D9E7E;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1A2E28;
+    line-height: 1.55;
+    margin-bottom: 26px;
+  }
+  .choices { display: flex; flex-direction: column; gap: 12px; }
+  .choice-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 2px solid #E4EDEA;
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    color: #2E4A42;
+    font-weight: 500;
+    line-height: 1.6;
+    transition: border-color 0.18s, background 0.18s, transform 0.12s;
+    font-family: 'Noto Sans KR', sans-serif;
+    width: 100%;
+  }
+  .choice-btn:hover {
+    border-color: #2D9E7E;
+    background: #F2FAF7;
+    transform: translateY(-1px);
+  }
+  .choice-letter {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #E8F0EE;
+    color: #2D9E7E;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .nav-row { margin-top: 24px; }
+  .btn-back {
+    padding: 11px 20px;
+    border: 2px solid #D8E8E4;
+    border-radius: 12px;
+    background: #fff;
+    color: #5A7068;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-back:hover { border-color: #2D9E7E; color: #2D9E7E; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    width: 100%;
+    padding: 15px 24px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2D9E7E, #27B890);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: opacity 0.15s, transform 0.12s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* ── RESULT ── */
+  .result-header {
+    text-align: center;
+    padding-bottom: 26px;
+    border-bottom: 1px solid #EEF4F2;
+    margin-bottom: 26px;
+  }
+  .result-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 26px;
+    border-radius: 99px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+  }
+  .result-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5A7068;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  .result-tagline {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1A2E28;
+    line-height: 1.5;
+  }
+  .result-style {
+    font-size: 13.5px;
+    color: #5A7068;
+    line-height: 1.75;
+    margin-top: 10px;
+  }
+
+  .section-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #2D9E7E;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  .guide-section {
+    background: #F7FAF9;
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .tips-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .tips-list li { font-size: 13.5px; color: #2E4A42; line-height: 1.65; }
+  .guide-text { font-size: 13.5px; color: #2E4A42; line-height: 1.75; }
+
+  .caution-section {
+    background: #FFF8F0;
+    border-left: 3px solid #F0A860;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-top: 20px;
+    margin-bottom: 24px;
+  }
+  .caution-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #C4844A;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .caution-text { font-size: 13.5px; color: #6B4A28; line-height: 1.7; }
+
+  .btn-restart {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #2D9E7E;
+    border-radius: 12px;
+    background: #fff;
+    color: #2D9E7E;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-restart:hover { background: #2D9E7E; color: #fff; }
+
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px; }
+    .intro-title { font-size: 22px; }
+    .q-text { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card">
+
+    <!-- ── INTRO SCREEN ── -->
+    <div id="screen-intro" class="screen active">
+      <div class="intro-badge">대학생 학습 유형 진단</div>
+      <h1 class="intro-title">나에게 맞는<br><span>공부법</span>을 찾아보세요</h1>
+      <p class="intro-desc">
+        12가지 질문에 솔직하게 답하면, 나의 MBTI 유형과 함께
+        학습 스타일·시험 전략·추천 환경을 알려드립니다.
+      </p>
+      <div class="intro-meta">
+        <div class="meta-chip"><strong>12문항</strong>소요 시간 약 3분</div>
+        <div class="meta-chip"><strong>16유형</strong>상세 학습 가이드</div>
+        <div class="meta-chip"><strong>무료</strong>로그인 불필요</div>
+      </div>
+      <button class="btn-primary" onclick="startQuiz()">검사 시작하기 →</button>
+    </div>
+
+    <!-- ── QUIZ SCREEN ── -->
+    <div id="screen-quiz" class="screen">
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <span id="axis-label">에너지 방향</span>
+          <span id="q-counter">1 / 12</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      <div class="q-axis" id="q-axis"></div>
+      <p class="q-text" id="q-text"></p>
+      <div class="choices">
+        <button class="choice-btn" id="btn-a" onclick="choose(0)">
+          <span class="choice-letter">A</span>
+          <span id="label-a"></span>
+        </button>
+        <button class="choice-btn" id="btn-b" onclick="choose(1)">
+          <span class="choice-letter">B</span>
+          <span id="label-b"></span>
+        </button>
+      </div>
+      <div class="nav-row" id="back-row" style="display:none">
+        <button class="btn-back" onclick="goBack()">← 이전</button>
+      </div>
+    </div>
+
+    <!-- ── RESULT SCREEN ── -->
+    <div id="screen-result" class="screen">
+      <div class="result-header">
+        <div class="result-type-badge" id="result-badge"></div>
+        <div class="result-name" id="result-name"></div>
+        <div class="result-tagline" id="result-tagline"></div>
+        <div class="result-style" id="result-style"></div>
+      </div>
+      <div class="section-title">📖 과목별 공부법</div>
+      <div class="guide-section"><ul class="tips-list" id="result-tips"></ul></div>
+      <div class="section-title">📝 시험 전략</div>
+      <div class="guide-section"><p class="guide-text" id="result-exam"></p></div>
+      <div class="section-title">🏠 추천 학습 환경</div>
+      <div class="guide-section"><p class="guide-text" id="result-env"></p></div>
+      <div class="caution-section">
+        <div class="caution-title">⚠️ 주의할 점</div>
+        <p class="caution-text" id="result-caution"></p>
+      </div>
+      <button class="btn-restart" onclick="restart()">↺ 다시 검사하기</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── 데이터: 문항 ──
+const QUESTIONS = [
+  { axis:"EI", axisLabel:"에너지 방향",
+    text:"조별 과제에서 역할을 정할 때, 나는…",
+    a:{label:"자연스럽게 먼저 의견을 꺼내고 토론을 이끈다", value:"E"},
+    b:{label:"다른 사람들의 의견을 듣고 나서 내 생각을 정리한다", value:"I"} },
+  { axis:"EI", axisLabel:"에너지 방향",
+    text:"긴 시험 기간 동안 에너지를 충전하는 방법은?",
+    a:{label:"친구들과 카페나 스터디에서 함께 공부하며 기운을 얻는다", value:"E"},
+    b:{label:"혼자만의 공간에서 집중하며 재충전한다", value:"I"} },
+  { axis:"EI", axisLabel:"에너지 방향",
+    text:"수업 중 교수님이 자유롭게 발언하라고 하면?",
+    a:{label:"떠오르는 생각이 있으면 바로 말한다", value:"E"},
+    b:{label:"충분히 생각한 후에, 혹은 말 안 하고 혼자 정리한다", value:"I"} },
+  { axis:"SN", axisLabel:"정보 수집",
+    text:"새로운 전공 수업을 처음 들을 때, 나는…",
+    a:{label:"교재 순서대로 기초부터 차근차근 이해하고 싶다", value:"S"},
+    b:{label:"이 과목의 전체적인 의미와 핵심 개념부터 파악하고 싶다", value:"N"} },
+  { axis:"SN", axisLabel:"정보 수집",
+    text:"과제나 레포트를 쓸 때 나의 방식은?",
+    a:{label:"사실과 자료를 꼼꼼히 정리하고, 구체적인 근거를 중심으로 쓴다", value:"S"},
+    b:{label:"큰 틀의 주장을 먼저 세우고, 아이디어를 자유롭게 전개한다", value:"N"} },
+  { axis:"SN", axisLabel:"정보 수집",
+    text:"수업에서 가장 잘 기억에 남는 내용은?",
+    a:{label:"구체적인 사례, 수치, 절차처럼 실제로 적용 가능한 것들", value:"S"},
+    b:{label:"개념 사이의 연결고리나 '왜?'에 대한 통찰", value:"N"} },
+  { axis:"TF", axisLabel:"판단 기준",
+    text:"팀 프로젝트에서 팀원이 실수를 했을 때, 나는…",
+    a:{label:"무엇이 잘못됐는지 분석하고 더 나은 방향을 제안한다", value:"T"},
+    b:{label:"팀원이 상처받지 않도록 분위기를 먼저 살핀다", value:"F"} },
+  { axis:"TF", axisLabel:"판단 기준",
+    text:"학점이나 성과를 평가받을 때 내가 더 중요하게 보는 것은?",
+    a:{label:"결과가 객관적으로 공정한지, 기준이 명확한지", value:"T"},
+    b:{label:"노력과 성장을 알아봐 주는지, 피드백이 따뜻한지", value:"F"} },
+  { axis:"TF", axisLabel:"판단 기준",
+    text:"진로나 수강 신청을 결정할 때 나의 기준은?",
+    a:{label:"논리적으로 유리한 선택, 취업·실용성 등 효율을 따진다", value:"T"},
+    b:{label:"내가 진짜 하고 싶은 것, 가치관과 맞는 것을 우선한다", value:"F"} },
+  { axis:"JP", axisLabel:"생활 양식",
+    text:"시험 준비 방식은?",
+    a:{label:"몇 주 전부터 계획표를 세우고 날짜별로 분량을 나눠 공부한다", value:"J"},
+    b:{label:"시험이 가까워질수록 집중이 되어 그때그때 필요한 것부터 한다", value:"P"} },
+  { axis:"JP", axisLabel:"생활 양식",
+    text:"한 학기 스케줄을 떠올릴 때, 나는…",
+    a:{label:"중간·기말 일정을 미리 파악하고 역산해서 할 일을 정해둔다", value:"J"},
+    b:{label:"큰 틀만 잡고, 상황에 따라 유연하게 움직인다", value:"P"} },
+  { axis:"JP", axisLabel:"생활 양식",
+    text:"과제 마감이 있을 때 주로 어떻게 하나요?",
+    a:{label:"마감 전날엔 이미 끝내두는 편이다", value:"J"},
+    b:{label:"마감 당일, 혹은 전날 밤에 몰아서 하는 편이다", value:"P"} },
+];
+
+// ── 데이터: 16유형 ──
+const MBTI_DATA = {
+  INTJ:{ emoji:"🔭", name:"전략적 설계자", color:"#4A90A4",
+    tagline:"체계와 깊이로 스스로의 길을 만드는 유형",
+    style:"독립적 심층 학습형. 개념 간 구조를 파악한 후 빠르게 확장하며, 스스로 세운 계획을 강하게 밀어붙인다.",
+    tips:["📚 암기과목: 마인드맵으로 구조화 후 → '왜 이 순서인가'를 스스로 설명하기","🔢 이해과목: 공식 유도 과정을 직접 써보며 원리부터 체득","✍️ 글쓰기/레포트: 아웃라인 먼저, 논리 흐름 점검 후 집필"],
+    exam:"시험 3주 전 마스터 플랜 수립 → 취약 단원 집중 타격 → 전날 전체 흐름 리뷰. 예상 문제를 스스로 만들어보는 것이 효과적.",
+    environment:"조용하고 방해받지 않는 개인 공간(독서실, 방). 음악 없이 집중, 장시간 몰입 세션 선호.",
+    caution:"완벽주의로 계획 수립에 너무 많은 에너지를 쓰지 않도록 주의. '80점짜리 계획을 실행'이 '100점짜리 계획을 구상'보다 낫다." },
+  INTP:{ emoji:"🧩", name:"탐구하는 이론가", color:"#6B8FA3",
+    tagline:"원리를 이해해야 진짜 아는 것이라 믿는 유형",
+    style:"개념 탐구형. '왜?'가 해결되면 빠르게 이해하지만, 흥미가 없는 과목엔 집중이 어렵다.",
+    tips:["📚 암기과목: 단순 암기보다 원리나 유래를 찾아 이해하면 오래 기억됨","🔢 이해과목: 교재 외 유튜브·논문 등 다양한 자료로 관점을 확장","✍️ 글쓰기/레포트: 초고 쓰기 전 '핵심 주장 한 줄'을 먼저 정의하기"],
+    exam:"핵심 개념 위주 압축 정리, 예상 문제 풀이 → 오답에서 개념 구멍 찾기. 직전 벼락치기보다 꾸준한 개념 축적이 유리.",
+    environment:"카페나 약간의 백색소음이 있는 환경. 흥미 있는 주제를 먼저 공부하면 전체 흐름이 잡힘.",
+    caution:"흥미로운 내용에 과몰입해 시험 범위를 벗어나는 경우 주의. 타이머 기법으로 탐구 시간 제한하기." },
+  ENTJ:{ emoji:"⚡", name:"주도하는 설계자", color:"#3A7A8C",
+    tagline:"목표를 설정하고 효율적으로 달성하는 유형",
+    style:"목표 지향형. 큰 그림을 먼저 잡고 역산하여 계획을 세운다. 스터디 리더 역할에서 시너지가 난다.",
+    tips:["📚 암기과목: 챕터별 핵심 키워드 목록 작성 → 스스로 강의하듯 말로 설명","🔢 이해과목: 시험 기출 분석으로 출제 패턴 파악 후 집중 공략","✍️ 글쓰기/레포트: 논증 구조 먼저 잡기 (주장→근거→반박→결론)"],
+    exam:"역산 계획표(시험일 → 오늘)로 일별 목표 설정. 모의 시험으로 실전 연습 필수.",
+    environment:"조용한 개인 공간 또는 소규모 스터디 그룹 리딩. 명확한 목표가 있을 때 집중력 극대화.",
+    caution:"속도에 집중하다 이해 없이 넘어가는 경우 주의. 팀플에서 독단적 진행으로 갈등 생기지 않도록." },
+  ENTP:{ emoji:"💡", name:"아이디어 탐험가", color:"#5B8DB8",
+    tagline:"새로운 가능성을 발견하며 지식을 즐기는 유형",
+    style:"아이디어 연결형. 다양한 분야를 넘나들며 개념을 연결할 때 가장 잘 배운다.",
+    tips:["📚 암기과목: 스토리텔링으로 내용 재구성, 친구에게 설명해주는 연습","🔢 이해과목: 실제 사례나 논쟁적 문제와 연결해 흥미 붙이기","✍️ 글쓰기/레포트: 마인드맵으로 아이디어 폭발 후 → 구조화 단계 거치기"],
+    exam:"개념 간 연결 위주로 공부. 다양한 문제 유형을 접해야 응용력이 발휘됨.",
+    environment:"카페, 스터디 카페 등 적당한 자극이 있는 공간. 토론 스터디에서 강점 발휘.",
+    caution:"여러 주제를 동시에 파다가 시험 범위를 놓치는 일이 잦음. '이번 주 목표' 한 가지에 집중하는 훈련 필요." },
+  INFJ:{ emoji:"🌿", name:"통찰하는 이상주의자", color:"#5C8A6E",
+    tagline:"의미와 연결을 찾으며 깊이 있게 배우는 유형",
+    style:"의미 추구형. 공부의 '왜'가 분명할 때 동기가 강하다. 장기적으로 깊이 파고드는 학습에 강하다.",
+    tips:["📚 암기과목: 내용이 지닌 의미·맥락과 연결. 시각적 요약 노트 효과적","🔢 이해과목: 사회적 의미나 실제 영향력과 연결해 흥미 붙이기","✍️ 글쓰기/레포트: 가치관과 연결되는 주제 선택 시 몰입도 극대화"],
+    exam:"조용한 공간에서 충분한 예습 + 요약 노트 만들기. 시험 당일엔 이른 시작으로 긴장 관리.",
+    environment:"조용하고 아늑한 개인 공간. 감정적으로 안정된 상태에서 집중력이 최고.",
+    caution:"완벽한 노트 만들기에 집착하다 정작 복습 시간이 부족해지는 경우 주의." },
+  INFP:{ emoji:"🎨", name:"가치 탐구자", color:"#8A7BAA",
+    tagline:"자신만의 방식으로 진심을 담아 배우는 유형",
+    style:"가치 연결형. 자신이 중요하다고 느끼는 내용은 깊이 파고들지만, 흥미 없는 과목엔 동기 부여가 어렵다.",
+    tips:["📚 암기과목: 스토리·이미지·감성 노트로 기억에 연결","🔢 이해과목: 해당 지식이 세상에 미치는 의미와 연결해 흥미 유발","✍️ 글쓰기/레포트: 솔직한 자신의 관점을 녹여 쓸 때 글의 힘이 생김"],
+    exam:"조용한 공간에서 자신만의 요약 노트 작성. 타인과 비교하지 않는 페이스 유지가 중요.",
+    environment:"집, 도서관 개인 좌석. 음악 또는 백색소음 틀어두면 집중 도움.",
+    caution:"흥미 없는 과목 미루기 습관 주의. '딱 15분만' 루틴으로 시작 장벽 낮추기." },
+  ENFJ:{ emoji:"🌟", name:"영감을 주는 멘토", color:"#C4844A",
+    tagline:"함께 성장하며 배움의 가치를 나누는 유형",
+    style:"관계 학습형. 가르치고 나누며 배울 때 이해도와 기억력이 높아진다.",
+    tips:["📚 암기과목: 친구에게 설명하거나 소그룹 스터디에서 발표 역할 맡기","🔢 이해과목: 스터디 그룹 토론으로 개념 확인 + 보완","✍️ 글쓰기/레포트: 독자를 설득한다는 의식으로 글 쓰면 논리가 탄탄해짐"],
+    exam:"스터디 그룹에서 서로 문제 내기, 개념 설명하기가 최고의 복습법.",
+    environment:"조용한 카페나 스터디룸. 팀원들과 함께하는 공부 세션에서 시너지 극대화.",
+    caution:"다른 사람 도와주다 자신의 공부 시간을 잃지 않도록 주의. 혼자 공부 시간 반드시 확보." },
+  ENFP:{ emoji:"🌈", name:"열정적인 탐험가", color:"#D4844A",
+    tagline:"흥미와 가능성으로 에너지를 불태우는 유형",
+    style:"영감 폭발형. 새로운 아이디어나 자극을 받으면 단기간에 엄청난 집중력을 발휘한다.",
+    tips:["📚 암기과목: 관련 영상·팟캐스트 먼저 들으며 흥미 붙이기 → 교재 정독","🔢 이해과목: '이게 현실에서 어디 쓰이지?' 질문으로 동기 연결","✍️ 글쓰기/레포트: 아이디어 폭발 → 구조 다듬기 → 퇴고 순서 엄수"],
+    exam:"포모도로 기법(25분 집중 + 5분 휴식)으로 집중 유지. 색상 펜·형광펜 활용 시각화.",
+    environment:"활기 있는 카페나 스터디 카페. 완전히 혼자보단 다른 사람이 공부하는 분위기 속에서 집중.",
+    caution:"마감 직전 몰아치는 패턴 반복 시 번아웃 위험. 최소 마감 3일 전 완성 목표 설정." },
+  ISTJ:{ emoji:"📋", name:"신뢰할 수 있는 실행가", color:"#607B8C",
+    tagline:"계획대로, 기초부터 차근차근 완성하는 유형",
+    style:"체계적 반복 학습형. 정해진 루틴 안에서 꾸준히 쌓아가는 방식에서 최고 실력이 나온다.",
+    tips:["📚 암기과목: 반복 읽기 + 손으로 쓰기(필기) 조합. 일정 간격 복습 효과 탁월","🔢 이해과목: 예제 문제 단계별로 풀기, 공식 암기 후 적용 연습","✍️ 글쓰기/레포트: 개요 → 본문 → 검토 순서를 지키면 완성도 높음"],
+    exam:"분량을 날짜별로 나눈 계획표 + 체크리스트. 기출문제 분석으로 출제 유형 파악.",
+    environment:"조용한 독서실 또는 자기 방. 매일 같은 시간 공부하는 루틴을 갖추면 집중력 배가.",
+    caution:"계획이 조금이라도 틀어지면 의욕이 떨어지는 경향. 플랜B를 미리 마련해두기." },
+  ISFJ:{ emoji:"🌸", name:"따뜻한 수호자", color:"#7A9C7E",
+    tagline:"성실하게, 관계 속에서 배움을 완성하는 유형",
+    style:"성실 축적형. 매일 조금씩 정리하고 복습하는 습관이 강점. 구체적인 사례 중심으로 이해한다.",
+    tips:["📚 암기과목: 색깔 펜 활용한 정리 노트 + 매일 짧은 복습","🔢 이해과목: 개념 설명 후 바로 예제 풀기 → 개념-적용 연결","✍️ 글쓰기/레포트: 구체적 사례와 데이터를 잘 활용하면 설득력 높은 글 완성"],
+    exam:"꾸준한 복습 덕분에 시험 전 부담이 적음. 마지막 주는 전범위 훑기 + 취약 부분 집중.",
+    environment:"조용한 도서관 또는 집. 심리적으로 안정된 환경에서 집중력 최고.",
+    caution:"타인의 부탁을 거절 못해 내 공부 시간이 줄어드는 경우 주의. 시험 기간엔 거절 연습도 필요." },
+  ESTJ:{ emoji:"📌", name:"효율적인 관리자", color:"#5A7A8C",
+    tagline:"기준과 체계로 목표를 달성하는 유형",
+    style:"조직적 실행형. 명확한 목표와 체크리스트가 있을 때 최고 효율 발휘. 팀플 리더 역할에 강하다.",
+    tips:["📚 암기과목: 목차별 체크리스트 만들고 하나씩 완료 표시","🔢 이해과목: 유형별 문제풀이 반복 → 오답노트 작성","✍️ 글쓰기/레포트: 서론·본론·결론 구조 철저히, 단락마다 핵심 문장 먼저"],
+    exam:"기출 중심, 유형별 문제풀이로 효율 극대화. 모의 시험으로 시간 배분 연습.",
+    environment:"조용하고 정돈된 공간(독서실). 시간표 붙여두고 실행하는 환경 선호.",
+    caution:"효율 중심이다 보니 개념 이해보다 문제풀이 기술에 치중하는 경향. 왜 그런지를 함께 짚어보기." },
+  ESFJ:{ emoji:"💛", name:"배려하는 조력자", color:"#C4A84A",
+    tagline:"함께 공부하며 서로 성장하는 유형",
+    style:"협력 학습형. 스터디 그룹에서 내용을 정리·설명할 때 이해가 깊어진다.",
+    tips:["📚 암기과목: 친구에게 설명하며 복습, 스터디 세션 활용","🔢 이해과목: 같이 풀어보고 서로 설명하는 방식이 효과적","✍️ 글쓰기/레포트: 독자 입장에서 읽기 쉬운 글을 쓰는 데 강점"],
+    exam:"스터디 그룹 활용, 상호 설명하기. 혼자 공부할 때는 음성 녹음 후 재청취.",
+    environment:"스터디 카페나 조용한 카페. 동료와 함께하는 환경에서 집중력 높아짐.",
+    caution:"주변 분위기에 민감해 갈등이 있으면 공부에 집중 못할 수 있음. 갈등은 빠르게 해결하는 습관." },
+  ISTP:{ emoji:"🔧", name:"실용적인 분석가", color:"#7A8C6A",
+    tagline:"직접 해보며 원리를 파악하는 유형",
+    style:"실전 탐구형. 이론보다 실습, 예제보다 직접 적용에서 이해가 폭발한다.",
+    tips:["📚 암기과목: 이해 → 핵심 요약 → 손으로 재현 순서로","🔢 이해과목: 문제 먼저 풀어보고 막히면 이론 참조","✍️ 글쓰기/레포트: 핵심 근거 중심 간결하게 쓰기. 불필요한 수식어 제거"],
+    exam:"기출·실전 문제 위주. 풀다가 막히면 해당 개념만 빠르게 확인하는 방식.",
+    environment:"소음 적당한 혼자 공부 공간. 짧은 집중 세션 + 잦은 휴식이 잘 맞음.",
+    caution:"장기 계획 없이 즉흥적으로 공부하다 시험 전 범위를 못 끝내는 경우 주의." },
+  ISFP:{ emoji:"🍃", name:"조화로운 예술가", color:"#7A9C8E",
+    tagline:"감각과 감성으로 나만의 방식을 찾는 유형",
+    style:"감각 몰입형. 억지로 하는 공부보다 스스로 선택한 시간과 방식일 때 집중력이 높다.",
+    tips:["📚 암기과목: 시각적 이미지, 그림, 컬러 요약 노트","🔢 이해과목: 직접 그려보거나 실생활 예시와 연결","✍️ 글쓰기/레포트: 감성적 표현보다 논리 구조 잡는 연습을 의식적으로"],
+    exam:"자기 페이스 유지. 혼자만의 공부 루틴 완성 후 반복.",
+    environment:"혼자 집중할 수 있는 조용한 공간. 좋아하는 음악 틀어두면 집중에 도움.",
+    caution:"기분에 따라 공부 편차가 크므로, 최소 루틴(하루 1시간)은 기분과 무관하게 유지." },
+  ESTP:{ emoji:"⚡", name:"현실 감각의 행동가", color:"#C47A4A",
+    tagline:"빠른 판단과 실행으로 결과를 만드는 유형",
+    style:"실전 집중형. 이론보다 실전 문제풀이에서 훨씬 빠르게 학습한다. 단기 집중력이 탁월하다.",
+    tips:["📚 암기과목: 핵심만 추려 간략 요약 → 반복 퀴즈로 테스트","🔢 이해과목: 문제 먼저 → 틀린 후 이론 확인","✍️ 글쓰기/레포트: 결론부터 쓰고 근거를 채우는 방식이 잘 맞음"],
+    exam:"단기 집중 전략 유효. 핵심 내용 빠른 정리 + 기출 반복. 시험 당일 컨디션 관리가 중요.",
+    environment:"활기 있는 카페 또는 스터디. 완전히 조용한 곳보단 약간의 활기가 있는 환경이 잘 맞음.",
+    caution:"장기 공부 계획 없이 즉흥 공부하는 패턴이 반복되면 학기 전체 성적이 들쑥날쑥. 최소 주간 목표 설정 권장." },
+  ESFP:{ emoji:"🎉", name:"에너지 넘치는 활동가", color:"#D4944A",
+    tagline:"즐겁게, 함께, 지금 이 순간에 몰입하는 유형",
+    style:"경험 학습형. 재밌고 생생한 경험, 사람들과의 상호작용에서 가장 잘 배운다.",
+    tips:["📚 암기과목: 노래, 리듬, 스토리 활용. 친구와 번갈아 문제 내기","🔢 이해과목: 실제 사례와 연결, 영상 자료 적극 활용","✍️ 글쓰기/레포트: 마감 훨씬 전에 초안 작성 → 퇴고 단계 충분히"],
+    exam:"스터디 그룹에서 문제 내기, 퀴즈 방식 복습이 최고. 혼자 공부할 땐 포모도로 타이머 활용.",
+    environment:"활기 있는 스터디 카페, 소규모 스터디 그룹. 너무 조용한 환경보단 적당한 활기 필요.",
+    caution:"재미없는 과목을 계속 미루는 습관 주의. '딱 오늘 1시간만' 미션 부여로 시작." },
+};
+
+// ── 앱 상태 ──
+let answers = [];
+let currentIdx = 0;
+
+function show(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+}
+
+function startQuiz() {
+  answers = [];
+  currentIdx = 0;
+  renderQuestion();
+  show('screen-quiz');
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentIdx];
+  const total = QUESTIONS.length;
+  const pct = (currentIdx / total) * 100;
+
+  document.getElementById('axis-label').textContent = q.axisLabel;
+  document.getElementById('q-counter').textContent = `${currentIdx + 1} / ${total}`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-axis').textContent = `${q.axis[0]} vs ${q.axis[1]}`;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('label-a').textContent = q.a.label;
+  document.getElementById('label-b').textContent = q.b.label;
+  document.getElementById('back-row').style.display = currentIdx > 0 ? 'block' : 'none';
+}
+
+function choose(optionIdx) {
+  const q = QUESTIONS[currentIdx];
+  const value = optionIdx === 0 ? q.a.value : q.b.value;
+  answers[currentIdx] = value;
+  currentIdx++;
+
+  if (currentIdx >= QUESTIONS.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function goBack() {
+  if (currentIdx > 0) {
+    currentIdx--;
+    renderQuestion();
+  }
+}
+
+function calcMBTI(ans) {
+  const c = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+  ans.forEach(v => { if(v) c[v]++; });
+  return (c.E>=c.I?'E':'I') + (c.S>=c.N?'S':'N') + (c.T>=c.F?'T':'F') + (c.J>=c.P?'J':'P');
+}
+
+function showResult() {
+  const mbti = calcMBTI(answers);
+  const d = MBTI_DATA[mbti];
+  if (!d) return;
+
+  document.getElementById('result-badge').style.background = d.color;
+  document.getElementById('result-badge').innerHTML = `<span>${d.emoji}</span> ${mbti}`;
+  document.getElementById('result-name').textContent = d.name;
+  document.getElementById('result-tagline').textContent = d.tagline;
+  document.getElementById('result-style').textContent = d.style;
+
+  const tipsList = document.getElementById('result-tips');
+  tipsList.innerHTML = d.tips.map(t => `<li>${t}</li>`).join('');
+
+  document.getElementById('result-exam').textContent = d.exam;
+  document.getElementById('result-env').textContent = d.environment;
+  document.getElementById('result-caution').textContent = d.caution;
+
+  // 결과 화면으로 스크롤
+  show('screen-result');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  answers = [];
+  currentIdx = 0;
+  show('screen-intro');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
